@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IA{% endblock %}
+
+{% block body %}
+    <h1>IA</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ium.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ ium.nom }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_i_a_index') }}">back to list</a>
+
+    <a href="{{ path('app_i_a_edit', {'id': ium.id}) }}">edit</a>
+
+    {{ include('ia/_delete_form.html.twig') }}
+{% endblock %}

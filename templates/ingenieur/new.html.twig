@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Ingenieur{% endblock %}
+
+{% block body %}
+    <h1>Create new Ingenieur</h1>
+
+    {{ include('ingenieur/_form.html.twig') }}
+
+    <a href="{{ path('app_ingenieur_index') }}">back to list</a>
+{% endblock %}
