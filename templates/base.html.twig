@@ -248,7 +248,7 @@
             <span class="badge-notif">{{ notifications_count ?? 0 }}</span>
         </button>
         <div class="nav-avatar">
-            {{ app.user ? app.user.email[0]|upper ~ (app.user.email[1]|upper) : 'AI' }}
+            {{ app.user ? app.user.email|slice(0,1)|upper ~ app.user.email|slice(1,1)|upper : 'AI' }}
         </div>
     </div>
 </nav>

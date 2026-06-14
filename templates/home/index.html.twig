@@ -1,20 +1,170 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Vue d'ensemble — AI Incident Manager{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/GestionIA/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/var/www/html/GestionIA/templates/home/index.html.twig</code></li>
-    </ul>
+<div class="page-header">
+    <div>
+        <div class="page-title">Vue d'ensemble</div>
+        <div class="page-subtitle">
+            {{ "now"|date("d/m/Y") }} &mdash; {{ tickets_total }} ticket{{ tickets_total > 1 ? 's' : '' }} au total
+        </div>
+    </div>
+    <a href="{{ path('app_ticket_new') }}" class="btn-primary">
+        <i class="ti ti-plus"></i> Nouveau ticket
+    </a>
 </div>
+
+{# ── Stat cards ── #}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Tickets prioritaires</div>
+        <div class="stat-value danger">{{ tickets_prioritaires }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Tickets normaux</div>
+        <div class="stat-value">{{ tickets_normaux }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Modèles IA</div>
+        <div class="stat-value">{{ nb_ia }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Éditeurs</div>
+        <div class="stat-value">{{ nb_editeurs }}</div>
+    </div>
+</div>
+
+{# ── Grille principale ── #}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem">
+
+    {# Tickets récents #}
+    <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
+                <i class="ti ti-alert-triangle" style="color:var(--danger)"></i>Tickets récents
+            </span>
+            <a href="{{ path('app_ticket_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
+                Voir tout <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+            </a>
+        </div>
+
+        {% for ticket in tickets_recents %}
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
+            <span class="dot {{ ticket.priorite ? 'dot-open' : 'dot-resolved' }}"></span>
+            <span style="flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                {{ ticket.description }}
+            </span>
+            {% if ticket.priorite %}
+                <span class="severity sev-critical">Prioritaire</span>
+            {% else %}
+                <span class="severity sev-low">Normal</span>
+            {% endif %}
+        </div>
+        {% else %}
+        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
+            Aucun ticket
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Modèles IA et leurs versions #}
+    <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
+                <i class="ti ti-robot" style="color:#534AB7"></i>Modèles IA
+            </span>
+            <a href="{{ path('app_ia_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
+                Gérer <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+            </a>
+        </div>
+
+        {% for ia in ias %}
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
+            <div style="width:28px;height:28px;border-radius:6px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;color:var(--text-secondary)">
+                {{ ia.nom|slice(0,1)|upper }}
+            </div>
+            <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">{{ ia.nom }}</div>
+                <div style="font-size:11px;color:var(--text-muted)">
+                    {{ ia.editeur ? ia.editeur.nom : 'Éditeur inconnu' }}
+                </div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted)">
+                {{ ia.versions|length }} version{{ ia.versions|length > 1 ? 's' : '' }}
+            </div>
+        </div>
+        {% else %}
+        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
+            Aucun modèle IA
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{# ── Deuxième grille ── #}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+    {# Versions récentes #}
+    <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
+                <i class="ti ti-versions" style="color:var(--info)"></i>Versions
+            </span>
+            <a href="{{ path('app_version_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
+                Voir tout <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+            </a>
+        </div>
+
+        {% for version in versions_recentes %}
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
+            <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">{{ version.nom }}</div>
+                <div style="font-size:11px;color:var(--text-muted)">{{ version.ia ? version.ia.nom : '—' }}</div>
+            </div>
+            <span class="severity {% if version.statut == 'en cours' %}sev-medium{% elseif version.statut == 'terminé' %}sev-low{% else %}sev-high{% endif %}">
+                {{ version.statut }}
+            </span>
+        </div>
+        {% else %}
+        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
+            Aucune version
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Ingénieurs #}
+    <div class="table-card">
+        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
+                <i class="ti ti-users" style="color:var(--success)"></i>Ingénieurs
+            </span>
+            <a href="{{ path('app_ingenieur_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
+                Voir tout <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+            </a>
+        </div>
+
+        {% for ing in ingenieurs %}
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--info-bg);color:var(--info);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0">
+                {{ ing.prenom|slice(0,1)|upper }}{{ ing.nom|slice(0,1)|upper }}
+            </div>
+            <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">{{ ing.prenom }} {{ ing.nom }}</div>
+                <div style="font-size:11px;color:var(--text-muted)">
+                    {{ ing.tickets|length }} ticket{{ ing.tickets|length > 1 ? 's' : '' }} assigné{{ ing.tickets|length > 1 ? 's' : '' }}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
+            Aucun ingénieur
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
 {% endblock %}
