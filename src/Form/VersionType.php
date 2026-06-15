@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class VersionType extends AbstractType
 {
@@ -15,10 +16,17 @@ class VersionType extends AbstractType
     {
         $builder
             ->add('nom')
-            ->add('statut')
+            ->add('statut', ChoiceType::class, [
+                'label' => 'Choisissez une option',
+                'choices' => [
+                    'Fonctionnel' => 'ok', // Si pas de ticket
+                    'En Etude' => 'mid', // Si ticket pas prio  
+                    'Défaillante' => 'pas_ok', // Si ticket prio
+                ],
+            ])
             ->add('ia', EntityType::class, [
                 'class' => IA::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
         ;
     }

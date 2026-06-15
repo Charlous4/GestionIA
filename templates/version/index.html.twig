@@ -19,7 +19,17 @@
             <tr>
                 <td>{{ version.id }}</td>
                 <td>{{ version.nom }}</td>
-                <td>{{ version.statut }}</td>
+                <td>
+                    {% if version.statut == 'ok' %}
+                        <span class="severity sev-low">Fonctionnel</span>
+                    {% elseif version.statut == 'mid' %}
+                        <span class="severity sev-high">En Étude</span>
+                    {% elseif version.statut == 'pas_ok' %}
+                        <span class="severity sev-critical">Défaillante</span>
+                    {% else %}
+                        <span class="severity">{{ version.statut }}</span>
+                    {% endif %}
+                </td>
                 <td>
                     <a href="{{ path('app_version_show', {'id': version.id}) }}">show</a>
                     <a href="{{ path('app_version_edit', {'id': version.id}) }}">edit</a>

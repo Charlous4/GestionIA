@@ -20,6 +20,11 @@ CREATE TABLE "public"."editeur" (
 )
 WITH (oids = false);
 
+INSERT INTO "editeur" ("id", "nom") VALUES
+(1,	'OpenIA'),
+(2,	'Anthropic'),
+(3,	'Google'),
+(4,	'Microsoft');
 
 DROP TABLE IF EXISTS "ia";
 CREATE TABLE "public"."ia" (
@@ -32,6 +37,11 @@ WITH (oids = false);
 
 CREATE INDEX idx_cf5393df3375bd21 ON public.ia USING btree (editeur_id);
 
+INSERT INTO "ia" ("id", "nom", "editeur_id") VALUES
+(1,	'ChatGPT',	1),
+(2,	'Claude',	2),
+(3,	'Gemini',	3),
+(4,	'Copilot',	4);
 
 DROP TABLE IF EXISTS "ingenieur";
 CREATE TABLE "public"."ingenieur" (
@@ -42,6 +52,8 @@ CREATE TABLE "public"."ingenieur" (
 )
 WITH (oids = false);
 
+INSERT INTO "ingenieur" ("id", "nom", "prenom") VALUES
+(1,	'RUBIO',	'Charles');
 
 DROP TABLE IF EXISTS "ticket";
 CREATE TABLE "public"."ticket" (
@@ -58,6 +70,9 @@ CREATE INDEX idx_97a0ada34bbc2705 ON public.ticket USING btree (version_id);
 
 CREATE INDEX idx_97a0ada3331c8f6 ON public.ticket USING btree (ingenieur_id);
 
+INSERT INTO "ticket" ("id", "description", "priorite", "version_id", "ingenieur_id") VALUES
+(2,	'M''a insulté',	'f',	4,	NULL),
+(6,	'Ne répond pas',	't',	11,	1);
 
 DROP TABLE IF EXISTS "version";
 CREATE TABLE "public"."version" (
@@ -71,6 +86,18 @@ WITH (oids = false);
 
 CREATE INDEX idx_bf1cd3c3489a6e65 ON public.version USING btree (ia_id);
 
+INSERT INTO "version" ("id", "nom", "statut", "ia_id") VALUES
+(1,	'GPT 5-5',	'ok',	1),
+(2,	'GPT-4o',	'ok',	1),
+(3,	'GPT-4.1',	'ok',	1),
+(4,	'Haiku 4.5',	'ok',	2),
+(5,	'Sonnet 4.6',	'ok',	2),
+(6,	'Opus 4.8',	'ok',	2),
+(7,	'Fable 5',	'mid',	2),
+(8,	'3.1 Flash-Lite',	'ok',	3),
+(9,	'3.5 Flash',	'ok',	3),
+(10,	'3.1 Pro',	'ok',	3),
+(11,	'MCS',	'pas_ok',	4);
 
 ALTER TABLE ONLY "public"."ia" ADD CONSTRAINT "fk_cf5393df3375bd21" FOREIGN KEY (editeur_id) REFERENCES editeur(id);
 
@@ -79,4 +106,4 @@ ALTER TABLE ONLY "public"."ticket" ADD CONSTRAINT "fk_97a0ada34bbc2705" FOREIGN 
 
 ALTER TABLE ONLY "public"."version" ADD CONSTRAINT "fk_bf1cd3c3489a6e65" FOREIGN KEY (ia_id) REFERENCES ia(id);
 
--- 2026-06-14 15:53:17 UTC
+-- 2026-06-15 14:47:18 UTC

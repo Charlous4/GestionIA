@@ -19,13 +19,20 @@ class TicketType extends AbstractType
             ->add('priorite')
             ->add('version', EntityType::class, [
                 'class' => Version::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
             ->add('ingenieur', EntityType::class, [
                 'class' => Ingenieur::class,
-                'choice_label' => 'id',
+                
+                'choice_label' => function (Ingenieur $inge) { return $inge->getNom() . ' ' . $inge->getPrenom();},
+                
+                
+                'required' => false,
+                
+                
+                'placeholder' => '-- Aucun ingénieur (À attribuer) --',
             ])
-        ;
+        ; 
     }
 
     public function configureOptions(OptionsResolver $resolver): void

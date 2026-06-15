@@ -3,13 +3,15 @@
 {% block title %}Ticket index{% endblock %}
 
 {% block body %}
-    <h1>Ticket index</h1>
+    <h1>Ticket d'incident</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>Numéro</th>
+                <th>Version</th>
                 <th>Description</th>
+                <th> Occupé par </th>
                 <th>Priorite</th>
                 <th>actions</th>
             </tr>
@@ -19,7 +21,15 @@
             <tr>
                 <td>{{ ticket.id }}</td>
                 <td>{{ ticket.description }}</td>
-                <td>{{ ticket.priorite ? 'Yes' : 'No' }}</td>
+                <td>{{ ticket.version ? ticket.version.nom : 'Non assigné' }}</td>
+                <td>
+                    {% if ticket.ingenieur %}
+                        {{ ticket.ingenieur.nom|upper }} {{ ticket.ingenieur.prenom }}
+                    {% else %}
+                        <span class="text-muted">Non assigné</span>
+                    {% endif %}
+                </td>
+                <td>{{ ticket.priorite ? 'Oui' : 'Non' }}</td>
                 <td>
                     <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}">show</a>
                     <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>

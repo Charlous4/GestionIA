@@ -33,8 +33,22 @@ final class TicketController extends AbstractController
             $entityManager->persist($ticket);
             $entityManager->flush();
 
+            $version = $ticket->getVersion();
+        
+            if ($ticket->isPriorite() && $version !== null){
+                $version->setStatut('pas_ok');
+                $entityManager->persist($version);
+            }
+
+            $entityManager->persist($ticket);
+            $entityManager->flush();
+
             return $this->redirectToRoute('app_ticket_index', [], Response::HTTP_SEE_OTHER);
         }
+        
+        
+
+       
 
         return $this->render('ticket/new.html.twig', [
             'ticket' => $ticket,

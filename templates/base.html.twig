@@ -247,9 +247,6 @@
             <i class="ti ti-bell"></i>
             <span class="badge-notif">{{ notifications_count ?? 0 }}</span>
         </button>
-        <div class="nav-avatar">
-            {{ app.user ? app.user.email|slice(0,1)|upper ~ app.user.email|slice(1,1)|upper : 'AI' }}
-        </div>
     </div>
 </nav>
 
@@ -262,7 +259,6 @@
                 <i class="ti ti-layout-dashboard"></i> Vue d'ensemble
             </a>
             <a href="{{ path('app_ticket_index') }}" class="sidebar-item {{ app.current_route starts with 'app_incident' ? 'active' }}">
-                <i class="ti ti-alert-triangle"></i> Incidents
                 {% if open_count is defined and open_count > 0 %}
                     <span class="sidebar-count">{{ open_count }}</span>
                 {% endif %}
@@ -275,7 +271,16 @@
                 <i class="ti ti-robot"></i> Modèles IA
             </a>
             <a href="{{ path('app_editeur_index') }}" class="sidebar-item {{ app.current_route starts with 'app_category' ? 'active' }}">
-                <i class="ti ti-tag"></i> Catégories
+                <i class="ti ti-tag"></i> Editeurs
+            </a>
+             <a href="{{ path('app_ingenieur_index') }}" class="sidebar-item {{ app.current_route starts with 'app_model' ? 'active' }}">
+                <i class="ti ti-robot"></i> Personnels
+            </a>
+            <a href="{{ path('app_version_index') }}" class="sidebar-item {{ app.current_route starts with 'app_model' ? 'active' }}">
+                <i class="ti ti-robot"></i> Version
+            </a>
+            <a href="{{ path('app_ticket_index') }}" class="sidebar-item {{ app.current_route starts with 'app_model' ? 'active' }}">
+                <i class="ti ti-robot"></i> Ticket
             </a>
         </div>
         <div class="sidebar-section">

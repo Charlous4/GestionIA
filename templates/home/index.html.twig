@@ -11,9 +11,16 @@
             {{ "now"|date("d/m/Y") }} &mdash; {{ tickets_total }} ticket{{ tickets_total > 1 ? 's' : '' }} au total
         </div>
     </div>
-    <a href="{{ path('app_ticket_new') }}" class="btn-primary">
-        <i class="ti ti-plus"></i> Nouveau ticket
-    </a>
+    
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ path('app_ticket_new') }}" class="btn-primary">
+            <i class="ti ti-plus"></i> Nouveau ticket
+        </a>
+
+        <a href="http://192.168.1.160/adminer.php" target="_blank" class="btn-primary" style="background: var(--info); color: white;">
+            <i class="ti ti-database"></i> Accès Base de donnée
+        </a>
+    </div>
 </div>
 
 {# ── Stat cards ── #}
@@ -125,7 +132,17 @@
                 <div style="font-size:11px;color:var(--text-muted)">{{ version.ia ? version.ia.nom : '—' }}</div>
             </div>
             <span class="severity {% if version.statut == 'en cours' %}sev-medium{% elseif version.statut == 'terminé' %}sev-low{% else %}sev-high{% endif %}">
-                {{ version.statut }}
+                <td>
+                    {% if version.statut == 'ok' %}
+                        <span class="severity sev-low">Fonctionnel</span>
+                    {% elseif version.statut == 'mid' %}
+                        <span class="severity sev-high">En Étude</span>
+                    {% elseif version.statut == 'pas_ok' %}
+                        <span class="severity sev-critical">Défaillante</span>
+                    {% else %}
+                        <span class="severity">{{ version.statut }}</span>
+                    {% endif %}
+                </td>
             </span>
         </div>
         {% else %}
