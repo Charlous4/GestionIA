@@ -1,30 +1,147 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Ticket{% endblock %}
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
 
 {% block body %}
-    <h1>Ticket</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ ticket.id }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ ticket.description }}</td>
-            </tr>
-            <tr>
-                <th>Priorite</th>
-                <td>{{ ticket.priorite ? 'Yes' : 'No' }}</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="pg-header anim">
+    <div style="display:flex;align-items:center;gap:12px">
+        <a href="{{ path('app_ticket_index') }}"
+           style="width:34px;height:34px;border-radius:var(--r8);background:var(--bg-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none;transition:all .15s"
+           onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t2)'">
+            <i class="ti ti-arrow-left" style="font-size:15px"></i>
+        </a>
+        <div>
+            <div class="pg-title" style="display:flex;align-items:center;gap:10px">
+                Ticket
+                <span style="font-size:14px;font-weight:400;color:var(--t3);font-family:monospace">#{{ ticket.id }}</span>
+                {% if ticket.priorite %}
+                    <span class="badge badge-red"><span class="dot dot-red" style="width:5px;height:5px;margin-right:4px"></span>Urgent</span>
+                {% else %}
+                    <span class="badge badge-green">Normal</span>
+                {% endif %}
+            </div>
+            <div class="pg-sub">Détail de l'incident</div>
+        </div>
+    </div>
+    <div style="display:flex;gap:8px">
+        <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}" class="btn-primary">
+            <i class="ti ti-pencil" style="font-size:13px"></i> Modifier
+        </a>
+    </div>
+</div>
 
-    <a href="{{ path('app_ticket_index') }}">back to list</a>
+<div style="display:grid;grid-template-columns:1fr 320px;gap:16px" class="anim anim-1">
 
-    <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
+    {# Bloc principal #}
+    <div style="display:flex;flex-direction:column;gap:14px">
 
-    {{ include('ticket/_delete_form.html.twig') }}
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><i class="ti ti-file-description" style="font-size:15px;color:var(--t3)"></i> Description</div>
+            </div>
+            <div style="padding:1.25rem 1.5rem">
+                <p style="color:var(--t1);font-size:14px;line-height:1.7">{{ ticket.description }}</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><i class="ti ti-versions" style="font-size:15px;color:var(--blue)"></i> Version concernée</div>
+            </div>
+            {% if ticket.version %}
+            <div class="list-row">
+                <div class="ava ava-purple">{{ ticket.version.nom|slice(0,1)|upper }}</div>
+                <div style="flex:1">
+                    <div style="font-size:13px;font-weight:500;color:var(--t1)">{{ ticket.version.nom }}</div>
+                    <div style="font-size:11px;color:var(--t3)">{{ ticket.version.ia ? ticket.version.ia.nom : '—' }}</div>
+                </div>
+                {% if ticket.version.statut == 'ok' %}
+                    <span class="badge badge-green">Fonctionnel</span>
+                {% elseif ticket.version.statut == 'mid' %}
+                    <span class="badge badge-amber">En étude</span>
+                {% elseif ticket.version.statut == 'pas_ok' %}
+                    <span class="badge badge-red">Défaillante</span>
+                {% else %}
+                    <span class="badge badge-blue">{{ ticket.version.statut }}</span>
+                {% endif %}
+            </div>
+            {% else %}
+            <div style="padding:1.25rem;color:var(--t3)">Aucune version associée</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {# Panneau latéral #}
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><i class="ti ti-info-circle" style="font-size:15px;color:var(--t3)"></i> Informations</div>
+            </div>
+            <div style="padding:1rem">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+                        <span style="font-size:12px;color:var(--t3)">ID</span>
+                        <span style="font-size:12px;font-family:monospace;color:var(--t2)">#{{ ticket.id }}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+                        <span style="font-size:12px;color:var(--t3)">Priorité</span>
+                        {% if ticket.priorite %}
+                            <span class="badge badge-red">Urgent</span>
+                        {% else %}
+                            <span class="badge badge-green">Normal</span>
+                        {% endif %}
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+                        <span style="font-size:12px;color:var(--t3)">Modèle IA</span>
+                        <span style="font-size:12px;color:var(--t2)">{{ ticket.version ? ticket.version.ia.nom : '—' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><i class="ti ti-user" style="font-size:15px;color:var(--green)"></i> Ingénieur assigné</div>
+            </div>
+            {% if ticket.ingenieur %}
+            <div class="list-row">
+                <div class="ava ava-blue ava-circle">
+                    {{ ticket.ingenieur.prenom|slice(0,1)|upper }}{{ ticket.ingenieur.nom|slice(0,1)|upper }}
+                </div>
+                <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--t1)">{{ ticket.ingenieur.prenom }} {{ ticket.ingenieur.nom|upper }}</div>
+                    <div style="font-size:11px;color:var(--t3)">Ingénieur</div>
+                </div>
+            </div>
+            {% else %}
+            <div style="padding:1.25rem;text-align:center;color:var(--t3)">
+                <i class="ti ti-user-off" style="font-size:20px;display:block;margin-bottom:4px"></i>
+                Non assigné
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card" style="border-color:rgba(255,71,87,.15)">
+            <div class="card-head" style="border-color:rgba(255,71,87,.1)">
+                <div class="card-title" style="color:var(--red)"><i class="ti ti-trash" style="font-size:15px"></i> Zone dangereuse</div>
+            </div>
+            <div style="padding:1rem">
+                <p style="font-size:12px;color:var(--t3);margin-bottom:10px">La suppression est irréversible.</p>
+                <form method="post" action="{{ path('app_ticket_delete', {'id': ticket.id}) }}"
+                      onsubmit="return confirm('Confirmer la suppression du ticket #{{ ticket.id }} ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ticket.id) }}">
+                    <button type="submit"
+                            style="width:100%;padding:8px;border-radius:var(--r8);background:var(--red-bg);color:var(--red);border:1px solid rgba(255,71,87,.25);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s"
+                            onmouseover="this.style.background='rgba(255,71,87,.2)'" onmouseout="this.style.background='var(--red-bg)'">
+                        <i class="ti ti-trash" style="font-size:13px;margin-right:5px"></i>Supprimer ce ticket
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 {% endblock %}

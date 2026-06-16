@@ -1,57 +1,116 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Ticket index{% endblock %}
+{% block title %}Tickets d'incident{% endblock %}
 
 {% block body %}
-    <h1>Ticket d'incident</h1>
 
-    <table class="table">
+<div class="pg-header anim">
+    <div>
+        <div class="pg-title">Tickets d'incident</div>
+        <div class="pg-sub">{{ tickets|length }} ticket{{ tickets|length > 1 ? 's' : '' }} au total</div>
+    </div>
+    <a href="{{ path('app_ticket_new') }}" class="btn-primary">
+        <i class="ti ti-plus" style="font-size:14px"></i> Nouveau ticket
+    </a>
+</div>
+
+<div class="table-card anim anim-1">
+    <div class="table-toolbar">
+        <i class="ti ti-search" style="color:var(--t3);font-size:15px"></i>
+        <input type="text" placeholder="Rechercher un ticket…" id="search-input">
+    </div>
+
+    <table id="tickets-table">
         <thead>
             <tr>
-                <th>Numéro</th>
-                <th>IA</th>
+                <th style="width:60px">#</th>
+                <th>Modèle IA</th>
                 <th>Version</th>
                 <th>Description</th>
-                <th> Occupé par </th>
-                <th>Priorite</th>
-                <th>actions</th>
+                <th>Assigné à</th>
+                <th>Priorité</th>
+                <th style="width:100px">Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for ticket in tickets %}
-            <tr>
-                <td>{{ ticket.id }}</td>
-
-                <td>{{ ticket.version.ia.nom }} </td>
-
-                <td>{{ ticket.version ? ticket.version.nom : 'Non assigné' }}</td>
-
-                <td>{{ ticket.description }}</td>
-                
+            <tr class="ticket-row">
+                <td>
+                    <span style="font-size:11px;color:var(--t3);font-family:monospace">#{{ ticket.id }}</span>
+                </td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div class="ava ava-purple" style="width:26px;height:26px;font-size:10.5px">
+                            {{ ticket.version.ia.nom|slice(0,1)|upper }}
+                        </div>
+                        <span style="color:var(--t1);font-weight:500">{{ ticket.version.ia.nom }}</span>
+                    </div>
+                </td>
+                <td>
+                    <span style="font-size:12px;background:var(--bg-3);padding:2px 8px;border-radius:99px;color:var(--t2);border:1px solid var(--border)">
+                        {{ ticket.version ? ticket.version.nom : '—' }}
+                    </span>
+                </td>
+                <td style="max-width:240px">
+                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t1)">
+                        {{ ticket.description }}
+                    </div>
+                </td>
                 <td>
                     {% if ticket.ingenieur %}
-                        {{ ticket.ingenieur.nom|upper }} {{ ticket.ingenieur.prenom }}
+                    <div style="display:flex;align-items:center;gap:7px">
+                        <div class="ava ava-blue ava-circle" style="width:24px;height:24px;font-size:10px">
+                            {{ ticket.ingenieur.prenom|slice(0,1)|upper }}{{ ticket.ingenieur.nom|slice(0,1)|upper }}
+                        </div>
+                        <span style="color:var(--t2)">{{ ticket.ingenieur.nom|upper }} {{ ticket.ingenieur.prenom }}</span>
+                    </div>
                     {% else %}
-                        <span class="text-muted">Non assigné</span>
+                    <span style="color:var(--t3);font-size:12px">Non assigné</span>
                     {% endif %}
                 </td>
-                
-                <td>{{ ticket.priorite ? 'Oui' : 'Non' }}</td>
-                
                 <td>
-                    <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}">show</a>
-                    <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
-                
+                    {% if ticket.priorite %}
+                        <span class="badge badge-red">
+                            <span class="dot dot-red" style="width:5px;height:5px;margin-right:4px"></span>
+                            Urgent
+                        </span>
+                    {% else %}
+                        <span class="badge badge-green">Normal</span>
+                    {% endif %}
                 </td>
-            
+                <td>
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}"
+                           style="width:28px;height:28px;border-radius:var(--r8);background:var(--bg-3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none;transition:all .15s"
+                           title="Voir" onmouseover="this.style.color='var(--blue)';this.style.borderColor='rgba(56,189,248,.3)'" onmouseout="this.style.color='var(--t2)';this.style.borderColor='var(--border)'">
+                            <i class="ti ti-eye" style="font-size:13px"></i>
+                        </a>
+                        <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}"
+                           style="width:28px;height:28px;border-radius:var(--r8);background:var(--bg-3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none;transition:all .15s"
+                           title="Modifier" onmouseover="this.style.color='#a09aff';this.style.borderColor='rgba(108,99,255,.3)'" onmouseout="this.style.color='var(--t2)';this.style.borderColor='var(--border)'">
+                            <i class="ti ti-pencil" style="font-size:13px"></i>
+                        </a>
+                    </div>
+                </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="7" style="text-align:center;padding:3rem;color:var(--t3)">
+                    <i class="ti ti-inbox" style="font-size:28px;display:block;margin-bottom:8px"></i>
+                    Aucun ticket trouvé
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+</div>
 
-    <a href="{{ path('app_ticket_new') }}">Create new</a>
+<script>
+document.getElementById('search-input').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.ticket-row').forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+</script>
+
 {% endblock %}

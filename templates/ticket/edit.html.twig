@@ -1,13 +1,89 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Edit Ticket{% endblock %}
+{% block title %}Modifier ticket #{{ ticket.id }}{% endblock %}
 
 {% block body %}
-    <h1>Edit Ticket</h1>
 
-    {{ include('ticket/_form.html.twig', {'button_label': 'Update'}) }}
+<div class="pg-header anim">
+    <div style="display:flex;align-items:center;gap:12px">
+        <a href="{{ path('app_ticket_index') }}"
+           style="width:34px;height:34px;border-radius:var(--r8);background:var(--bg-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none"
+           onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t2)'">
+            <i class="ti ti-arrow-left" style="font-size:15px"></i>
+        </a>
+        <div>
+            <div class="pg-title" style="display:flex;align-items:center;gap:10px">
+                Modifier le ticket
+                <span style="font-size:14px;font-weight:400;color:var(--t3);font-family:monospace">#{{ ticket.id }}</span>
+            </div>
+            <div class="pg-sub">{{ ticket.description|slice(0,60) }}{% if ticket.description|length > 60 %}…{% endif %}</div>
+        </div>
+    </div>
+    <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}" class="btn-ghost">
+        <i class="ti ti-eye" style="font-size:13px"></i> Voir le ticket
+    </a>
+</div>
 
-    <a href="{{ path('app_ticket_index') }}">back to list</a>
+<div style="max-width:680px" class="anim anim-1">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">
+                <i class="ti ti-pencil" style="color:#a09aff;font-size:15px"></i>
+                Modifier les informations
+            </div>
+        </div>
+        <div style="padding:1.5rem">
+            {{ form_start(form, {'attr': {'style': 'display:flex;flex-direction:column;gap:1.1rem'}}) }}
+                {{ form_widget(form) }}
+                <div style="display:flex;gap:10px;padding-top:0.5rem;border-top:1px solid var(--border);margin-top:0.5rem">
+                    <button type="submit" class="btn-primary">
+                        <i class="ti ti-check" style="font-size:13px"></i> Enregistrer
+                    </button>
+                    <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}" class="btn-ghost">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
 
-    {{ include('ticket/_delete_form.html.twig') }}
+    <div class="card" style="margin-top:14px;border-color:rgba(255,71,87,.15)">
+        <div class="card-head" style="border-color:rgba(255,71,87,.1)">
+            <div class="card-title" style="color:var(--red)">
+                <i class="ti ti-trash" style="font-size:15px"></i> Zone dangereuse
+            </div>
+        </div>
+        <div style="padding:1rem;display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+                <div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:3px">Supprimer ce ticket</div>
+                <div style="font-size:12px;color:var(--t3)">Cette action est irréversible.</div>
+            </div>
+            <form method="post" action="{{ path('app_ticket_delete', {'id': ticket.id}) }}"
+                  onsubmit="return confirm('Confirmer la suppression du ticket #{{ ticket.id }} ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ticket.id) }}">
+                <button type="submit"
+                        style="padding:8px 14px;border-radius:var(--r8);background:var(--red-bg);color:var(--red);border:1px solid rgba(255,71,87,.25);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s"
+                        onmouseover="this.style.background='rgba(255,71,87,.2)'" onmouseout="this.style.background='var(--red-bg)'">
+                    <i class="ti ti-trash" style="font-size:13px;margin-right:5px"></i>Supprimer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.main-content form label { display:block;font-size:11.5px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px; }
+.main-content form input[type=text],
+.main-content form input[type=email],
+.main-content form input[type=number],
+.main-content form textarea,
+.main-content form select {
+    width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r8);
+    padding:9px 12px;color:var(--t1);font-size:13px;font-family:inherit;outline:none;
+    transition:border-color .15s;
+}
+.main-content form input:focus,
+.main-content form textarea:focus,
+.main-content form select:focus { border-color:rgba(108,99,255,.5); }
+.main-content form textarea { min-height:100px;resize:vertical; }
+.main-content form input[type=checkbox] { width:16px;height:16px;accent-color:var(--accent); }
+</style>
+
 {% endblock %}
