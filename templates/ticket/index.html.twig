@@ -9,6 +9,7 @@
         <thead>
             <tr>
                 <th>Numéro</th>
+                <th>IA</th>
                 <th>Version</th>
                 <th>Description</th>
                 <th> Occupé par </th>
@@ -20,8 +21,13 @@
         {% for ticket in tickets %}
             <tr>
                 <td>{{ ticket.id }}</td>
-                <td>{{ ticket.description }}</td>
+
+                <td>{{ ticket.version.ia.nom }} </td>
+
                 <td>{{ ticket.version ? ticket.version.nom : 'Non assigné' }}</td>
+
+                <td>{{ ticket.description }}</td>
+                
                 <td>
                     {% if ticket.ingenieur %}
                         {{ ticket.ingenieur.nom|upper }} {{ ticket.ingenieur.prenom }}
@@ -29,11 +35,15 @@
                         <span class="text-muted">Non assigné</span>
                     {% endif %}
                 </td>
+                
                 <td>{{ ticket.priorite ? 'Oui' : 'Non' }}</td>
+                
                 <td>
                     <a href="{{ path('app_ticket_show', {'id': ticket.id}) }}">show</a>
                     <a href="{{ path('app_ticket_edit', {'id': ticket.id}) }}">edit</a>
+                
                 </td>
+            
             </tr>
         {% else %}
             <tr>

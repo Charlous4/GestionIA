@@ -1,184 +1,209 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Vue d'ensemble — AI Incident Manager{% endblock %}
 
 {% block body %}
 
-<div class="page-header">
+<div class="pg-header anim">
     <div>
-        <div class="page-title">Vue d'ensemble</div>
-        <div class="page-subtitle">
-            {{ "now"|date("d/m/Y") }} &mdash; {{ tickets_total }} ticket{{ tickets_total > 1 ? 's' : '' }} au total
-        </div>
+        <div class="pg-title">Vue d'ensemble</div>
+        <div class="pg-sub">{{ "now"|date("d/m/Y · H:i") }} &mdash; Tableau de bord en temps réel</div>
     </div>
-    
-    <div style="display: flex; gap: 10px;">
+    <div style="display:flex;gap:8px">
         <a href="{{ path('app_ticket_new') }}" class="btn-primary">
-            <i class="ti ti-plus"></i> Nouveau ticket
+            <i class="ti ti-plus" style="font-size:14px"></i> Nouveau ticket
         </a>
-
-        <a href="http://192.168.1.160/adminer.php" target="_blank" class="btn-primary" style="background: var(--info); color: white;">
-            <i class="ti ti-database"></i> Accès Base de donnée
+        <a href="http://192.168.1.160/adminer.php" target="_blank" class="btn-ghost">
+            <i class="ti ti-database" style="font-size:14px"></i> Base de données
         </a>
     </div>
 </div>
 
-{# ── Stat cards ── #}
-<div class="stats-grid">
+{# ── Stats ── #}
+<div class="stats-grid anim anim-1">
     <div class="stat-card">
-        <div class="stat-label">Tickets prioritaires</div>
-        <div class="stat-value danger">{{ tickets_prioritaires }}</div>
+        <div class="stat-icon" style="background:rgba(255,71,87,.12);color:var(--red)">
+            <i class="ti ti-alert-circle"></i>
+        </div>
+        <div class="stat-label">Prioritaires</div>
+        <div class="stat-val red">{{ tickets_prioritaires }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Tickets normaux</div>
-        <div class="stat-value">{{ tickets_normaux }}</div>
+        <div class="stat-icon" style="background:rgba(16,185,129,.12);color:var(--green)">
+            <i class="ti ti-circle-check"></i>
+        </div>
+        <div class="stat-label">Normaux</div>
+        <div class="stat-val green">{{ tickets_normaux }}</div>
     </div>
     <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(108,99,255,.12);color:#a09aff">
+            <i class="ti ti-robot"></i>
+        </div>
         <div class="stat-label">Modèles IA</div>
-        <div class="stat-value">{{ nb_ia }}</div>
+        <div class="stat-val purple">{{ nb_ia }}</div>
     </div>
     <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(56,189,248,.12);color:var(--blue)">
+            <i class="ti ti-building"></i>
+        </div>
         <div class="stat-label">Éditeurs</div>
-        <div class="stat-value">{{ nb_editeurs }}</div>
+        <div class="stat-val blue">{{ nb_editeurs }}</div>
     </div>
 </div>
 
 {# ── Grille principale ── #}
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px" class="anim anim-2">
 
     {# Tickets récents #}
-    <div class="table-card">
-        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
-                <i class="ti ti-alert-triangle" style="color:var(--danger)"></i>Tickets récents
-            </span>
-            <a href="{{ path('app_ticket_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
-                Voir tout <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">
+                <i class="ti ti-alert-triangle" style="color:var(--red);font-size:15px"></i>
+                Tickets récents
+            </div>
+            <a href="{{ path('app_ticket_index') }}" class="card-link">
+                Voir tout <i class="ti ti-arrow-right" style="font-size:12px"></i>
             </a>
         </div>
-
         {% for ticket in tickets_recents %}
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
-            <span class="dot {{ ticket.priorite ? 'dot-open' : 'dot-resolved' }}"></span>
-            <span style="flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-                {{ ticket.description }}
-            </span>
+        <div class="list-row">
+            <div class="dot {{ ticket.priorite ? 'dot-red' : 'dot-green' }}"></div>
+            <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    {{ ticket.description }}
+                </div>
+                <div style="font-size:11px;color:var(--t3);margin-top:1px">
+                    {% if ticket.version %}{{ ticket.version.nom }}{% else %}—{% endif %}
+                    {% if ticket.ingenieur %} · {{ ticket.ingenieur.prenom }} {{ ticket.ingenieur.nom }}{% endif %}
+                </div>
+            </div>
             {% if ticket.priorite %}
-                <span class="severity sev-critical">Prioritaire</span>
+                <span class="badge badge-red">Urgent</span>
             {% else %}
-                <span class="severity sev-low">Normal</span>
+                <span class="badge badge-green">Normal</span>
             {% endif %}
         </div>
         {% else %}
-        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
+        <div style="padding:2.5rem;text-align:center;color:var(--t3)">
+            <i class="ti ti-mood-smile" style="font-size:22px;display:block;margin-bottom:6px"></i>
             Aucun ticket
         </div>
         {% endfor %}
     </div>
 
-    {# Modèles IA et leurs versions #}
-    <div class="table-card">
-        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
-                <i class="ti ti-robot" style="color:#534AB7"></i>Modèles IA
-            </span>
-            <a href="{{ path('app_ia_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
-                Gérer <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+    {# Modèles IA #}
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">
+                <i class="ti ti-robot" style="color:#a09aff;font-size:15px"></i>
+                Modèles IA
+            </div>
+            <a href="{{ path('app_ia_index') }}" class="card-link">
+                Gérer <i class="ti ti-arrow-right" style="font-size:12px"></i>
             </a>
         </div>
-
         {% for ia in ias %}
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
-            <div style="width:28px;height:28px;border-radius:6px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;color:var(--text-secondary)">
-                {{ ia.nom|slice(0,1)|upper }}
-            </div>
+        <div class="list-row">
+            <div class="ava ava-purple">{{ ia.nom|slice(0,1)|upper }}</div>
             <div style="flex:1">
-                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">{{ ia.nom }}</div>
-                <div style="font-size:11px;color:var(--text-muted)">
-                    {{ ia.editeur ? ia.editeur.nom : 'Éditeur inconnu' }}
-                </div>
+                <div style="font-size:13px;font-weight:500;color:var(--t1)">{{ ia.nom }}</div>
+                <div style="font-size:11px;color:var(--t3)">{{ ia.editeur ? ia.editeur.nom : 'Éditeur inconnu' }}</div>
             </div>
-            <div style="font-size:11px;color:var(--text-muted)">
-                {{ ia.versions|length }} version{{ ia.versions|length > 1 ? 's' : '' }}
+            <div style="text-align:right">
+                <div style="font-size:12px;color:var(--t2)">{{ ia.versions|length }} ver.</div>
+                {% set nb_tickets_ia = 0 %}
+
+                {# 2. On additionne le nombre de tickets de chaque version #}
+                {% for v in ia.versions %}
+                    {% set nb_tickets_ia = nb_tickets_ia + v.tickets|length %}
+                {% endfor %}
+
+                {# 3. Si le compteur est supérieur à 0, on affiche le badge #}
+                {% if nb_tickets_ia > 0 %}
+                    <span class="badge badge-red" style="font-size:9px">
+                        {{ nb_tickets_ia }} ticket{{ nb_tickets_ia > 1 ? 's' : '' }}
+                    </span>
+                {% endif %}
             </div>
         </div>
         {% else %}
-        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
-            Aucun modèle IA
-        </div>
+        <div style="padding:2.5rem;text-align:center;color:var(--t3)">Aucun modèle IA</div>
         {% endfor %}
     </div>
 
 </div>
 
 {# ── Deuxième grille ── #}
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="anim anim-3">
 
-    {# Versions récentes #}
-    <div class="table-card">
-        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
-                <i class="ti ti-versions" style="color:var(--info)"></i>Versions
-            </span>
-            <a href="{{ path('app_version_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
-                Voir tout <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+    {# Versions #}
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">
+                <i class="ti ti-versions" style="color:var(--blue);font-size:15px"></i>
+                Versions
+            </div>
+            <a href="{{ path('app_version_index') }}" class="card-link">
+                Voir tout <i class="ti ti-arrow-right" style="font-size:12px"></i>
             </a>
         </div>
-
         {% for version in versions_recentes %}
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
+        <div class="list-row">
             <div style="flex:1">
-                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">{{ version.nom }}</div>
-                <div style="font-size:11px;color:var(--text-muted)">{{ version.ia ? version.ia.nom : '—' }}</div>
+                <div style="font-size:13px;font-weight:500;color:var(--t1)">{{ version.nom }}</div>
+                <div style="font-size:11px;color:var(--t3)">
+                    {{ version.ia ? version.ia.nom : '—' }}
+                    · {{ version.tickets|length }} ticket{{ version.tickets|length > 1 ? 's' : '' }}
+                </div>
             </div>
-            <span class="severity {% if version.statut == 'en cours' %}sev-medium{% elseif version.statut == 'terminé' %}sev-low{% else %}sev-high{% endif %}">
-                <td>
-                    {% if version.statut == 'ok' %}
-                        <span class="severity sev-low">Fonctionnel</span>
-                    {% elseif version.statut == 'mid' %}
-                        <span class="severity sev-high">En Étude</span>
-                    {% elseif version.statut == 'pas_ok' %}
-                        <span class="severity sev-critical">Défaillante</span>
-                    {% else %}
-                        <span class="severity">{{ version.statut }}</span>
-                    {% endif %}
-                </td>
-            </span>
+            {% if version.statut == 'ok' %}
+                <span class="badge badge-green">Fonctionnel</span>
+            {% elseif version.statut == 'mid' %}
+                <span class="badge badge-amber">En étude</span>
+            {% elseif version.statut == 'pas_ok' %}
+                <span class="badge badge-red">Défaillante</span>
+            {% else %}
+                <span class="badge badge-blue">{{ version.statut }}</span>
+            {% endif %}
         </div>
         {% else %}
-        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
-            Aucune version
-        </div>
+        <div style="padding:2.5rem;text-align:center;color:var(--t3)">Aucune version</div>
         {% endfor %}
     </div>
 
     {# Ingénieurs #}
-    <div class="table-card">
-        <div style="padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-            <span style="font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px">
-                <i class="ti ti-users" style="color:var(--success)"></i>Ingénieurs
-            </span>
-            <a href="{{ path('app_ingenieur_index') }}" style="font-size:12px;color:var(--info);text-decoration:none">
-                Voir tout <i class="ti ti-arrow-right" style="font-size:12px;vertical-align:-1px"></i>
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">
+                <i class="ti ti-users" style="color:var(--green);font-size:15px"></i>
+                Ingénieurs
+            </div>
+            <a href="{{ path('app_ingenieur_index') }}" class="card-link">
+                Voir tout <i class="ti ti-arrow-right" style="font-size:12px"></i>
             </a>
         </div>
-
         {% for ing in ingenieurs %}
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,0.06)">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--info-bg);color:var(--info);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0">
+        <div class="list-row">
+            <div class="ava ava-blue ava-circle">
                 {{ ing.prenom|slice(0,1)|upper }}{{ ing.nom|slice(0,1)|upper }}
             </div>
             <div style="flex:1">
-                <div style="font-size:13px;font-weight:500;color:var(--text-primary)">{{ ing.prenom }} {{ ing.nom }}</div>
-                <div style="font-size:11px;color:var(--text-muted)">
+                <div style="font-size:13px;font-weight:500;color:var(--t1)">{{ ing.prenom }} {{ ing.nom }}</div>
+                <div style="font-size:11px;color:var(--t3)">
                     {{ ing.tickets|length }} ticket{{ ing.tickets|length > 1 ? 's' : '' }} assigné{{ ing.tickets|length > 1 ? 's' : '' }}
                 </div>
             </div>
+            {% if tickets_total > 0 and ing.tickets|length > 0 %}
+            <div style="width:50px">
+                <div style="height:3px;background:var(--bg-4);border-radius:99px;overflow:hidden">
+                    {% set pct = ((ing.tickets|length / tickets_total) * 100)|round %}
+                    <div style="height:100%;width:{{ pct > 100 ? 100 : pct }}%;background:linear-gradient(90deg,#6c63ff,#38bdf8);border-radius:99px"></div>
+                </div>
+                <div style="font-size:10px;color:var(--t3);text-align:right;margin-top:3px">{{ pct }}%</div>
+            </div>
+            {% endif %}
         </div>
         {% else %}
-        <div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:13px">
-            Aucun ingénieur
-        </div>
+        <div style="padding:2.5rem;text-align:center;color:var(--t3)">Aucun ingénieur</div>
         {% endfor %}
     </div>
 
