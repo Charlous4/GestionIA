@@ -1,30 +1,103 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Ingenieur{% endblock %}
+{% block title %}{{ ingenieur.prenom }} {{ ingenieur.nom }}{% endblock %}
 
 {% block body %}
-    <h1>Ingenieur</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ ingenieur.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ ingenieur.nom }}</td>
-            </tr>
-            <tr>
-                <th>Prenom</th>
-                <td>{{ ingenieur.prenom }}</td>
-            </tr>
-        </tbody>
-    </table>
+{% set colors = ['#6c63ff', '#38bdf8', '#10b981', '#f59e0b', '#ec4899', '#a09aff'] %}
+{% set c = colors[ingenieur.id % 6] %}
 
-    <a href="{{ path('app_ingenieur_index') }}">back to list</a>
+<div class="pg-header anim">
+    <div style="display:flex;align-items:center;gap:12px">
+        <a href="{{ path('app_ingenieur_index') }}"
+           style="width:34px;height:34px;border-radius:var(--r8);background:var(--bg-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none;transition:color .15s"
+           onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t2)'">
+            <i class="ti ti-arrow-left" style="font-size:15px"></i>
+        </a>
+        <div style="width:44px;height:44px;border-radius:50%;background:{{ c }}22;border:1.5px solid {{ c }}40;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:{{ c }}">
+            {{ ingenieur.prenom|slice(0,1)|upper }}{{ ingenieur.nom|slice(0,1)|upper }}
+        </div>
+        <div>
+            <div class="pg-title">{{ ingenieur.prenom }} {{ ingenieur.nom|upper }}</div>
+            <div class="pg-sub">Ingénieur support</div>
+        </div>
+    </div>
+    <a href="{{ path('app_ingenieur_edit', {'id': ingenieur.id}) }}" class="btn-primary">
+        <i class="ti ti-pencil" style="font-size:13px"></i> Modifier
+    </a>
+</div>
 
-    <a href="{{ path('app_ingenieur_edit', {'id': ingenieur.id}) }}">edit</a>
+<div style="display:grid;grid-template-columns:1fr 320px;gap:16px" class="anim anim-1">
 
-    {{ include('ingenieur/_delete_form.html.twig') }}
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title"><i class="ti ti-alert-triangle" style="font-size:15px;color:var(--red)"></i> Tickets assignés</div>
+        </div>
+        {% for ticket in ingenieur.tickets %}
+        <div class="list-row">
+            <div class="dot {{ ticket.priorite ? 'dot-red' : 'dot-green' }}"></div>
+            <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    {{ ticket.description }}
+                </div>
+                <div style="font-size:11px;color:var(--t3)">
+                    {{ ticket.version ? ticket.version.ia.nom ~ ' — ' ~ ticket.version.nom : '—' }}
+                </div>
+            </div>
+            {% if ticket.priorite %}
+                <span class="badge badge-red">Urgent</span>
+            {% else %}
+                <span class="badge badge-green">Normal</span>
+            {% endif %}
+        </div>
+        {% else %}
+        <div style="padding:2.5rem;text-align:center;color:var(--t3)">
+            <i class="ti ti-mood-smile" style="font-size:22px;display:block;margin-bottom:6px"></i>
+            Aucun ticket assigné
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><i class="ti ti-info-circle" style="font-size:15px;color:var(--t3)"></i> Informations</div>
+            </div>
+            <div style="padding:1rem">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+                    <span style="font-size:12px;color:var(--t3)">ID</span>
+                    <span style="font-size:12px;font-family:monospace;color:var(--t2)">#{{ ingenieur.id }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+                    <span style="font-size:12px;color:var(--t3)">Nom</span>
+                    <span style="font-size:12px;color:var(--t2)">{{ ingenieur.nom|upper }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+                    <span style="font-size:12px;color:var(--t3)">Tickets</span>
+                    <span style="font-size:12px;color:var(--t2)">{{ ingenieur.tickets|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,71,87,.15)">
+            <div class="card-head" style="border-color:rgba(255,71,87,.1)">
+                <div class="card-title" style="color:var(--red)"><i class="ti ti-trash" style="font-size:15px"></i> Zone dangereuse</div>
+            </div>
+            <div style="padding:1rem">
+                <p style="font-size:12px;color:var(--t3);margin-bottom:10px">La suppression est irréversible.</p>
+                <form method="post" action="{{ path('app_ingenieur_delete', {'id': ingenieur.id}) }}"
+                      onsubmit="return confirm('Confirmer la suppression de {{ ingenieur.prenom }} {{ ingenieur.nom }} ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ingenieur.id) }}">
+                    <button type="submit"
+                            style="width:100%;padding:8px;border-radius:var(--r8);background:var(--red-bg);color:var(--red);border:1px solid rgba(255,71,87,.25);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s"
+                            onmouseover="this.style.background='rgba(255,71,87,.2)'" onmouseout="this.style.background='var(--red-bg)'">
+                        <i class="ti ti-trash" style="font-size:13px;margin-right:5px"></i>Supprimer l'ingénieur
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 {% endblock %}

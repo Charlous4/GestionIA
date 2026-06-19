@@ -1,37 +1,65 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Ingenieur index{% endblock %}
+{% block title %}Personnel{% endblock %}
 
 {% block body %}
-    <h1>Ingenieur index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Prenom</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for ingenieur in ingenieurs %}
-            <tr>
-                <td>{{ ingenieur.id }}</td>
-                <td>{{ ingenieur.nom }}</td>
-                <td>{{ ingenieur.prenom }}</td>
-                <td>
-                    <a href="{{ path('app_ingenieur_show', {'id': ingenieur.id}) }}">show</a>
-                    <a href="{{ path('app_ingenieur_edit', {'id': ingenieur.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="pg-header anim">
+    <div>
+        <div class="pg-title">Personnel</div>
+        <div class="pg-sub">{{ ingenieurs|length }} ingénieur{{ ingenieurs|length > 1 ? 's' : '' }} enregistré{{ ingenieurs|length > 1 ? 's' : '' }}</div>
+    </div>
+    <a href="{{ path('app_ingenieur_new') }}" class="btn-primary">
+        <i class="ti ti-user-plus" style="font-size:14px"></i> Nouvel ingénieur
+    </a>
+</div>
 
-    <a href="{{ path('app_ingenieur_new') }}">Create new</a>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px" class="anim anim-1">
+    {% for ingenieur in ingenieurs %}
+    {% set colors = ['#6c63ff', '#38bdf8', '#10b981', '#f59e0b', '#ec4899', '#a09aff'] %}
+    {% set c = colors[ingenieur.id % 6] %}
+    <div class="card" style="display:flex;flex-direction:column">
+        <div style="padding:1.25rem;display:flex;flex-direction:column;align-items:center;text-align:center;border-bottom:1px solid var(--border)">
+            <div style="width:56px;height:56px;border-radius:50%;background:{{ c }}22;border:1.5px solid {{ c }}40;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:{{ c }};margin-bottom:10px">
+                {{ ingenieur.prenom|slice(0,1)|upper }}{{ ingenieur.nom|slice(0,1)|upper }}
+            </div>
+            <div style="font-size:14.5px;font-weight:600;color:var(--t1)">{{ ingenieur.prenom }} {{ ingenieur.nom|upper }}</div>
+            <div style="font-size:11.5px;color:var(--t3);margin-top:2px">Ingénieur support</div>
+        </div>
+        <div style="padding:0.9rem 1.25rem;display:flex;justify-content:center;flex:1">
+            <div style="text-align:center">
+                <div style="font-size:20px;font-weight:600;color:{{ ingenieur.tickets|length > 0 ? 'var(--red)' : 'var(--t1)' }}">
+                    {{ ingenieur.tickets|length }}
+                </div>
+                <div style="font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">
+                    Ticket{{ ingenieur.tickets|length > 1 ? 's' : '' }} assigné{{ ingenieur.tickets|length > 1 ? 's' : '' }}
+                </div>
+            </div>
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px">
+            <a href="{{ path('app_ingenieur_show', {'id': ingenieur.id}) }}" class="ing-action ing-show">
+                <i class="ti ti-eye" style="font-size:14px"></i> Voir
+            </a>
+            <a href="{{ path('app_ingenieur_edit', {'id': ingenieur.id}) }}" class="ing-action ing-edit">
+                <i class="ti ti-pencil" style="font-size:14px"></i> Modifier
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--t3)">
+        <i class="ti ti-user-off" style="font-size:28px;display:block;margin-bottom:8px"></i>
+        Aucun ingénieur enregistré
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.ing-action {
+    flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:7px;border-radius:var(--r8);background:var(--bg-3);border:1px solid var(--border);
+    color:var(--t2);text-decoration:none;font-size:12.5px;transition:all .15s;
+}
+.ing-show:hover { border-color: rgba(56,189,248,.3); color: var(--blue); background: var(--blue-bg); }
+.ing-edit:hover { border-color: rgba(108,99,255,.3); color: #a09aff; background: rgba(108,99,255,.1); }
+</style>
+
 {% endblock %}

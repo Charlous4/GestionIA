@@ -34,9 +34,20 @@ final class TicketController extends AbstractController
             $entityManager->flush();
 
             $version = $ticket->getVersion();
-        
-            if ($ticket->isPriorite() && $version !== null){
-                $version->setStatut('pas_ok');
+
+
+            if ($version !== null) {
+                
+                
+                if ($ticket->isPriorite()) {
+                    
+                    $version->setStatut('pas_ok');
+                } else {
+                    
+                    $version->setStatut('mid');
+                }
+                
+                
                 $entityManager->persist($version);
             }
 

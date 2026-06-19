@@ -1,26 +1,103 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}IA{% endblock %}
+{% block title %}{{ ium.nom }}{% endblock %}
 
 {% block body %}
-    <h1>IA</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ ium.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ ium.nom }}</td>
-            </tr>
-        </tbody>
-    </table>
+{% set colors = ['#6c63ff', '#38bdf8', '#10b981', '#f59e0b', '#ec4899', '#a09aff'] %}
+{% set c = colors[ium.id % 6] %}
 
-    <a href="{{ path('app_ia_index') }}">back to list</a>
+<div class="pg-header anim">
+    <div style="display:flex;align-items:center;gap:12px">
+        <a href="{{ path('app_ia_index') }}"
+           style="width:34px;height:34px;border-radius:var(--r8);background:var(--bg-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none;transition:color .15s"
+           onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t2)'">
+            <i class="ti ti-arrow-left" style="font-size:15px"></i>
+        </a>
+        <div style="width:44px;height:44px;border-radius:var(--r12);background:{{ c }}22;border:1px solid {{ c }}40;display:flex;align-items:center;justify-content:center">
+            <i class="ti ti-robot-face" style="font-size:21px;color:{{ c }}"></i>
+        </div>
+        <div>
+            <div class="pg-title">{{ ium.nom }}</div>
+            <div class="pg-sub">{{ ium.editeur ? ium.editeur.nom : 'Éditeur inconnu' }}</div>
+        </div>
+    </div>
+    <a href="{{ path('app_ia_edit', {'id': ium.id}) }}" class="btn-primary">
+        <i class="ti ti-pencil" style="font-size:13px"></i> Modifier
+    </a>
+</div>
 
-    <a href="{{ path('app_ia_edit', {'id': ium.id}) }}">edit</a>
+<div style="display:grid;grid-template-columns:1fr 320px;gap:16px" class="anim anim-1">
 
-    {{ include('ia/_delete_form.html.twig') }}
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><i class="ti ti-versions" style="font-size:15px;color:var(--blue)"></i> Versions</div>
+            </div>
+            {% for v in ium.versions %}
+            <div class="list-row">
+                <div style="flex:1">
+                    <div style="font-size:13px;font-weight:500;color:var(--t1)">{{ v.nom }}</div>
+                    <div style="font-size:11px;color:var(--t3)">{{ v.tickets|length }} ticket{{ v.tickets|length > 1 ? 's' : '' }}</div>
+                </div>
+                {% if v.statut == 'ok' %}
+                    <span class="badge badge-green">Fonctionnel</span>
+                {% elseif v.statut == 'mid' %}
+                    <span class="badge badge-amber">En étude</span>
+                {% elseif v.statut == 'pas_ok' %}
+                    <span class="badge badge-red">Défaillante</span>
+                {% else %}
+                    <span class="badge badge-blue">{{ v.statut }}</span>
+                {% endif %}
+            </div>
+            {% else %}
+            <div style="padding:2rem;text-align:center;color:var(--t3)">Aucune version</div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title"><i class="ti ti-info-circle" style="font-size:15px;color:var(--t3)"></i> Informations</div>
+            </div>
+            <div style="padding:1rem">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+                    <span style="font-size:12px;color:var(--t3)">ID</span>
+                    <span style="font-size:12px;font-family:monospace;color:var(--t2)">#{{ ium.id }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+                    <span style="font-size:12px;color:var(--t3)">Éditeur</span>
+                    <span style="font-size:12px;color:var(--t2)">{{ ium.editeur ? ium.editeur.nom : '—' }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">
+                    <span style="font-size:12px;color:var(--t3)">Versions</span>
+                    <span style="font-size:12px;color:var(--t2)">{{ ium.versions|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,71,87,.15)">
+            <div class="card-head" style="border-color:rgba(255,71,87,.1)">
+                <div class="card-title" style="color:var(--red)"><i class="ti ti-trash" style="font-size:15px"></i> Zone dangereuse</div>
+            </div>
+            <div style="padding:1rem">
+                <p style="font-size:12px;color:var(--t3);margin-bottom:10px">La suppression est irréversible.</p>
+                <form method="post" action="{{ path('app_ia_delete', {'id': ium.id}) }}"
+                      onsubmit="return confirm('Confirmer la suppression de {{ ium.nom }} ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ ium.id) }}">
+                    <button type="submit"
+                            style="width:100%;padding:8px;border-radius:var(--r8);background:var(--red-bg);color:var(--red);border:1px solid rgba(255,71,87,.25);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s"
+                            onmouseover="this.style.background='rgba(255,71,87,.2)'" onmouseout="this.style.background='var(--red-bg)'">
+                        <i class="ti ti-trash" style="font-size:13px;margin-right:5px"></i>Supprimer ce modèle
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 {% endblock %}

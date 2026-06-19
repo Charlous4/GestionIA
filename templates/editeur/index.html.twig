@@ -1,35 +1,65 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Editeur index{% endblock %}
+{% block title %}Éditeurs{% endblock %}
 
 {% block body %}
-    <h1>Editeur index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for editeur in editeurs %}
-            <tr>
-                <td>{{ editeur.id }}</td>
-                <td>{{ editeur.nom }}</td>
-                <td>
-                    <a href="{{ path('app_editeur_show', {'id': editeur.id}) }}">show</a>
-                    <a href="{{ path('app_editeur_edit', {'id': editeur.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="pg-header anim">
+    <div>
+        <div class="pg-title">Éditeurs</div>
+        <div class="pg-sub">{{ editeurs|length }} éditeur{{ editeurs|length > 1 ? 's' : '' }} enregistré{{ editeurs|length > 1 ? 's' : '' }}</div>
+    </div>
+    <a href="{{ path('app_editeur_new') }}" class="btn-primary">
+        <i class="ti ti-plus" style="font-size:14px"></i> Nouvel éditeur
+    </a>
+</div>
 
-    <a href="{{ path('app_editeur_new') }}">Create new</a>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px" class="anim anim-1">
+    {% for editeur in editeurs %}
+    {% set colors = ['#6c63ff', '#38bdf8', '#10b981', '#f59e0b', '#ec4899', '#a09aff'] %}
+    {% set c = colors[editeur.id % 6] %}
+    <div class="card" style="display:flex;flex-direction:column">
+        <div style="padding:1.25rem;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)">
+            <div style="width:44px;height:44px;border-radius:var(--r12);background:{{ c }}22;border:1px solid {{ c }}40;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <i class="ti ti-building-skyscraper" style="font-size:20px;color:{{ c }}"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+                <div style="font-size:14.5px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    {{ editeur.nom }}
+                </div>
+                <div style="font-size:11.5px;color:var(--t3);margin-top:2px">Éditeur IA</div>
+            </div>
+        </div>
+        <div style="padding:0.9rem 1.25rem;flex:1">
+            <div style="font-size:18px;font-weight:600;color:var(--t1)">{{ editeur.iAs|length }}</div>
+            <div style="font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">
+                Modèle{{ editeur.iAs|length > 1 ? 's' : '' }} IA
+            </div>
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px">
+            <a href="{{ path('app_editeur_show', {'id': editeur.id}) }}" class="edt-action edt-show">
+                <i class="ti ti-eye" style="font-size:14px"></i> Voir
+            </a>
+            <a href="{{ path('app_editeur_edit', {'id': editeur.id}) }}" class="edt-action edt-edit">
+                <i class="ti ti-pencil" style="font-size:14px"></i> Modifier
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--t3)">
+        <i class="ti ti-building-off" style="font-size:28px;display:block;margin-bottom:8px"></i>
+        Aucun éditeur enregistré
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.edt-action {
+    flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+    padding:7px;border-radius:var(--r8);background:var(--bg-3);border:1px solid var(--border);
+    color:var(--t2);text-decoration:none;font-size:12.5px;transition:all .15s;
+}
+.edt-show:hover { border-color: rgba(56,189,248,.3); color: var(--blue); background: var(--blue-bg); }
+.edt-edit:hover { border-color: rgba(108,99,255,.3); color: #a09aff; background: rgba(108,99,255,.1); }
+</style>
+
 {% endblock %}

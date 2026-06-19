@@ -1,13 +1,85 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Edit Version{% endblock %}
+{% block title %}Modifier {{ version.nom }}{% endblock %}
 
 {% block body %}
-    <h1>Edit Version</h1>
 
-    {{ include('version/_form.html.twig', {'button_label': 'Update'}) }}
+<div class="pg-header anim">
+    <div style="display:flex;align-items:center;gap:12px">
+        <a href="{{ path('app_version_index') }}"
+           style="width:34px;height:34px;border-radius:var(--r8);background:var(--bg-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t2);text-decoration:none;transition:color .15s"
+           onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t2)'">
+            <i class="ti ti-arrow-left" style="font-size:15px"></i>
+        </a>
+        <div>
+            <div class="pg-title">Modifier {{ version.nom }}</div>
+            <div class="pg-sub">Mise à jour de la version</div>
+        </div>
+    </div>
+    <a href="{{ path('app_version_show', {'id': version.id}) }}" class="btn-ghost">
+        <i class="ti ti-eye" style="font-size:13px"></i> Voir la fiche
+    </a>
+</div>
 
-    <a href="{{ path('app_version_index') }}">back to list</a>
+<div style="max-width:560px" class="anim anim-1">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">
+                <i class="ti ti-pencil" style="color:#a09aff;font-size:15px"></i>
+                Modifier les informations
+            </div>
+        </div>
+        <div style="padding:1.5rem">
+            {{ form_start(form, {'attr': {'style': 'display:flex;flex-direction:column;gap:1.1rem'}}) }}
+                {{ form_widget(form) }}
+                <div style="display:flex;gap:10px;padding-top:0.5rem;border-top:1px solid var(--border);margin-top:0.5rem">
+                    <button type="submit" class="btn-primary">
+                        <i class="ti ti-check" style="font-size:13px"></i> Enregistrer
+                    </button>
+                    <a href="{{ path('app_version_show', {'id': version.id}) }}" class="btn-ghost">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
 
-    {{ include('version/_delete_form.html.twig') }}
+    <div class="card" style="margin-top:14px;border-color:rgba(255,71,87,.15)">
+        <div class="card-head" style="border-color:rgba(255,71,87,.1)">
+            <div class="card-title" style="color:var(--red)">
+                <i class="ti ti-trash" style="font-size:15px"></i> Zone dangereuse
+            </div>
+        </div>
+        <div style="padding:1rem;display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+                <div style="font-size:13px;font-weight:500;color:var(--t1);margin-bottom:3px">Supprimer cette version</div>
+                <div style="font-size:12px;color:var(--t3)">Action irréversible.</div>
+            </div>
+            <form method="post" action="{{ path('app_version_delete', {'id': version.id}) }}"
+                  onsubmit="return confirm('Confirmer la suppression de {{ version.nom }} ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ version.id) }}">
+                <button type="submit"
+                        style="padding:8px 14px;border-radius:var(--r8);background:var(--red-bg);color:var(--red);border:1px solid rgba(255,71,87,.25);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s"
+                        onmouseover="this.style.background='rgba(255,71,87,.2)'" onmouseout="this.style.background='var(--red-bg)'">
+                    <i class="ti ti-trash" style="font-size:13px;margin-right:5px"></i>Supprimer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.main-content form label { display:block;font-size:11.5px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px; }
+.main-content form input[type=text],
+.main-content form input[type=email],
+.main-content form input[type=number],
+.main-content form textarea,
+.main-content form select {
+    width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--r8);
+    padding:9px 12px;color:var(--t1);font-size:13px;font-family:inherit;outline:none;
+    transition:border-color .15s;
+}
+.main-content form input:focus,
+.main-content form textarea:focus,
+.main-content form select:focus { border-color:rgba(108,99,255,.5); }
+.main-content form select { appearance:none; cursor:pointer; }
+</style>
+
 {% endblock %}
