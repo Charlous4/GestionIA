@@ -18,7 +18,7 @@ final class TicketController extends AbstractController
     public function index(TicketRepository $ticketRepository): Response
     {
         return $this->render('ticket/index.html.twig', [
-            'tickets' => $ticketRepository->findAll(),
+            'tickets' => $ticketRepository->findBy([], ['createAt' => 'DESC']),
         ]);
     }
 
@@ -30,37 +30,26 @@ final class TicketController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($ticket);
-            $entityManager->flush();
-
+            
             $version = $ticket->getVersion();
 
-
-            if ($version !== null) {
+            if ($version !== null) {  
+                // 1. On force la version à prendre le ticket en compte en mémoire
+                $version->addTicket($ticket);
                 
-                
-                if ($ticket->isPriorite()) {
-                    
-                    $version->setStatut('pas_ok');
-                } else {
-                    
-                    $version->setStatut('mid');
-                }
-                
-                
-                $entityManager->persist($version);
+                // 2. Maintenant on recalcule (et elle verra bien le nouveau ticket prioritaire !)
+                $version->recalculerStatut();
             }
 
+            // 3. On présente le ticket à Doctrine
             $entityManager->persist($ticket);
+            
+            // 4. On sauvegarde le tout (le nouveau ticket + le nouveau statut de la version)
             $entityManager->flush();
 
             return $this->redirectToRoute('app_ticket_index', [], Response::HTTP_SEE_OTHER);
         }
         
-        
-
-       
-
         return $this->render('ticket/new.html.twig', [
             'ticket' => $ticket,
             'form' => $form,
@@ -82,6 +71,12 @@ final class TicketController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $version = $ticket->getVersion();
+            if ($version !== null) {
+                
+                $version->recalculerStatut();
+            }
             $entityManager->flush();
 
             return $this->redirectToRoute('app_ticket_index', [], Response::HTTP_SEE_OTHER);
@@ -97,6 +92,16 @@ final class TicketController extends AbstractController
     public function delete(Request $request, Ticket $ticket, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$ticket->getId(), $request->getPayload()->getString('_token'))) {
+
+            $version = $ticket->getVersion();
+            
+            if ($version !== null) {
+                // On retire manuellement le ticket de la version avant de recalculer
+                $version->removeTicket($ticket); 
+                
+                // Déclenchement numéro 3 !
+                $version->recalculerStatut();
+            }
             $entityManager->remove($ticket);
             $entityManager->flush();
         }

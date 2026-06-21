@@ -105,4 +105,26 @@ class Version
 
         return $this;
     }
+
+    public function recalculerStatut(): self
+    {
+        
+        if ($this->tickets->isEmpty()) {
+            $this->statut = 'ok';
+            return $this;
+        }
+
+        
+        foreach ($this->tickets as $ticket) {
+            if ($ticket->isPriorite()) {
+                $this->statut = 'pas_ok';
+                return $this; 
+            }
+        }
+
+        
+        $this->statut = 'mid';
+        
+        return $this;
+    }
 }

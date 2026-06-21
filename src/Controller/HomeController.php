@@ -22,12 +22,18 @@ final class HomeController extends AbstractController
         IngenieurRepository $ingenieurRepo,
     ): Response {
         $allTickets = $ticketRepo->findAll();
+        
+        $tickets_recents = $ticketRepo->findBy(
+        [], 
+        ['createAt' => 'DESC'], 
+        5
+        );
 
         return $this->render('home/index.html.twig', [
             'tickets_total'      => count($allTickets),
             'tickets_prioritaires' => count(array_filter($allTickets, fn($t) => $t->isPriorite())),
             'tickets_normaux'    => count(array_filter($allTickets, fn($t) => !$t->isPriorite())),
-            'tickets_recents'    => array_slice($allTickets, 0, 5),
+            'tickets_recents'      => $tickets_recents,
             'ias'                => $iaRepo->findAll(),
             'nb_ia'              => count($iaRepo->findAll()),
             'nb_editeurs'        => count($editeurRepo->findAll()),
